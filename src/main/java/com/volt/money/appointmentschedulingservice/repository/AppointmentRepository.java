@@ -1,7 +1,6 @@
 package com.volt.money.appointmentschedulingservice.repository;
 
 import com.volt.money.appointmentschedulingservice.model.Appointment;
-import com.volt.money.appointmentschedulingservice.model.ServiceOperator;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

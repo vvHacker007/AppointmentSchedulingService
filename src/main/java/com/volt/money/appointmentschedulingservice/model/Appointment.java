@@ -1,6 +1,5 @@
 package com.volt.money.appointmentschedulingservice.model;
 
-import com.volt.money.appointmentschedulingservice.dto.AppointmentDTO;
 import com.volt.money.appointmentschedulingservice.dto.Slot;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +23,8 @@ public class Appointment {
     @Indexed
     private String date;
     private Slot slot;
-    private Boolean rescheduled;
-    private Boolean canceled;
+    private boolean rescheduled;
+    private boolean canceled;
     private Long createdTime;
     private Long modifiedTime;
     private boolean deleted;

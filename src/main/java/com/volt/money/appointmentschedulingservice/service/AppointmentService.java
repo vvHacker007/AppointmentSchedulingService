@@ -12,6 +12,7 @@ public interface AppointmentService {
     Appointment getAppointmentById(String id);
     List<Appointment> getAppointmentByServiceOperatorIdAndLocalDate(String id, LocalDate localDate);
     List<Appointment> getAppointmentByServiceOperatorId(String id);
+    List<Appointment> getOpenSlotsForAppointmentByServiceOperatorId(AppointmentDTO appointmentDTO);
     Appointment updateAppointment(AppointmentDTO appointmentDTO);
     Appointment deleteAppointment(AppointmentDTO appointmentDTO);
 

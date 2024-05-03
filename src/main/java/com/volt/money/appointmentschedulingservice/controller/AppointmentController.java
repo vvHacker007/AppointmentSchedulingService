@@ -32,6 +32,11 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAppointmentByServiceOperatorId(serviceOperatorId));
     }
 
+    @PostMapping("/service-operator/open-slots")
+    public ResponseEntity<List<Appointment>> getOpenSlotsForAppointmentByServiceOperatorId(@Validated @RequestBody AppointmentDTO appointmentDTO) {
+        return ResponseEntity.ok(appointmentService.getOpenSlotsForAppointmentByServiceOperatorId(appointmentDTO));
+    }
+
     @PutMapping("/")
     public ResponseEntity<Appointment> updateAppointment(@Validated @RequestBody AppointmentDTO appointmentDTO) {
         return ResponseEntity.ok(appointmentService.updateAppointment(appointmentDTO));

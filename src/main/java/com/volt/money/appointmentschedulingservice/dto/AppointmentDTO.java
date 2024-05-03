@@ -4,6 +4,7 @@ package com.volt.money.appointmentschedulingservice.dto;
 import com.volt.money.appointmentschedulingservice.model.Appointment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,7 +15,9 @@ import static com.volt.money.appointmentschedulingservice.util.TimeUtil.getEpoch
 @NoArgsConstructor
 public class AppointmentDTO {
     private String id;
+    @NonNull
     private String serviceOperatorId;
+    @NonNull
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
