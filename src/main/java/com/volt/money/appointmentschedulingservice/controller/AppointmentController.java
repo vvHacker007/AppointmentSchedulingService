@@ -19,6 +19,8 @@ public class AppointmentController {
 
     @PostMapping("/schedule")
     public ResponseEntity<Appointment> scheduleAppointment(@Validated @RequestBody AppointmentDTO appointmentDTO) {
+        appointmentDTO.setRescheduled(false);
+        appointmentDTO.setCanceled(false);
         return ResponseEntity.ok(appointmentService.scheduleAppointment(appointmentDTO));
     }
 
@@ -45,6 +47,11 @@ public class AppointmentController {
     @PostMapping("/cancel")
     public ResponseEntity<Appointment> cancelAppointment(@Validated @RequestBody AppointmentDTO appointmentDTO) {
         return ResponseEntity.ok(appointmentService.cancelAppointment(appointmentDTO));
+    }
+
+    @PostMapping("/reschedule")
+    public ResponseEntity<Appointment> rescheduleAppointment(@Validated @RequestBody AppointmentDTO appointmentDTO) {
+        return ResponseEntity.ok(appointmentService.rescheduleAppointment(appointmentDTO));
     }
 
 

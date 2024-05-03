@@ -9,6 +9,7 @@ import java.util.List;
 public interface AppointmentService {
     Appointment scheduleAppointment(AppointmentDTO appointmentDTO);
     Appointment cancelAppointment(AppointmentDTO appointmentDTO);
+    Appointment rescheduleAppointment(AppointmentDTO appointmentDTO);
     Appointment getAppointmentById(String id);
     List<Appointment> getAppointmentByServiceOperatorIdAndLocalDate(String id, LocalDate localDate);
     List<Appointment> getAppointmentByServiceOperatorId(String id);

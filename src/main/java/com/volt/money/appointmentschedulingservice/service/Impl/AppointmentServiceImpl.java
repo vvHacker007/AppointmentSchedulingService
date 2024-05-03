@@ -40,17 +40,27 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new RuntimeException("Slot not available!");
         }
         Appointment appointment = appointmentDTO.apply(new Appointment());
-        appointment.setId(UUID.randomUUID().toString());
+        if(!appointment.isRescheduled()) {
+            appointment.setId(UUID.randomUUID().toString());
+        }
         serviceOperatorService.addAppointment(appointment.getServiceOperatorId(), appointment.getId());
         return appointmentRepository.save(appointment);
     }
 
     @Override
     public Appointment cancelAppointment(AppointmentDTO appointmentDTO) {
-        Appointment appointment = appointmentRepository.findNonDeletedById(appointmentDTO.getId()).orElseThrow();
-        appointment.setCanceled(Boolean.TRUE);
+        Appointment appointment = appointmentRepository.findNonDeletedNonCanceledById(appointmentDTO.getId()).orElseThrow();
+        appointment.setCanceled(true);
         serviceOperatorService.removeAppointment(appointment.getServiceOperatorId(), appointment.getId());
         return appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public Appointment rescheduleAppointment(AppointmentDTO appointmentDTO) {
+        Appointment appointment = appointmentRepository.findNonDeletedById(appointmentDTO.getId()).orElseThrow();
+        appointment.setRescheduled(true);
+        appointment.setCanceled(false);
+        return scheduleAppointment(appointmentDTO);
     }
 
     private boolean checkSlotAvailability(AppointmentDTO appointmentDTO, ServiceOperator serviceOperator) {
@@ -107,7 +117,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new RuntimeException("Service Operator Not Found for the appointment.");
         }
 
-        List<Slot> openAppointmentSlots = getOpenSlots(appointmentDTO, serviceOperator);
+        List<Slot> openAppointmentSlots = getOpenSlots(appointmentDTO);
 
         // DEBUG
         // Booked Slots ->
@@ -117,7 +127,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         // 11:20 -> 12:20 (open slot -> 10:30 -> 11:20) (not 1 hr long so discard)
         // 19:20 -> 20:20 (open slot -> 12:20 -> 19:20)
         // 22:10 -> 23:10 (open slot -> 20:20 -> 22:10)
-        // (last open slot -> 23:10 -> 23:59) (not 1 hr long so discard) (considered slots to be booked in one day only)
+        // 23:10 -> 00:10 (considered slots to be booked for one day at a time)
         //}
         for(Slot slot : openAppointmentSlots) {
             System.out.println("Start TIME:{}" + Instant.ofEpochMilli(slot.getStartTime()).atOffset(getLocalZone()).toLocalTime());
@@ -135,19 +145,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         }).collect(Collectors.toList());
     }
 
-    public List<Slot> getOpenSlots(AppointmentDTO appointmentDTO, ServiceOperator serviceOperator) {
+    public List<Slot> getOpenSlots(AppointmentDTO appointmentDTO) {
         List<Slot> openSlots = new ArrayList<>();
         List<Slot> bookedAppointmentSlots = appointmentRepository
                 .findNonDeletedNonCanceledAppointmentsByServiceOperatorIdAndLocalDate(
                         appointmentDTO.getServiceOperatorId(), appointmentDTO.getDate().toString()).stream()
                 .map(Appointment::getSlot).sorted(Comparator.comparingLong(Slot::getStartTime)).collect(Collectors.toList());
 
+        System.out.println("Booked Slots:{}"+ bookedAppointmentSlots.size());
+        System.out.println("Booked Slots:{}"+ bookedAppointmentSlots);
         // https://www.baeldung.com/java-day-start-end
         long startTime = getEpoch(LocalTime.MIN, appointmentDTO.getDate());
         long endTime = getEpoch(LocalTime.MAX, appointmentDTO.getDate());
 
         while (startTime<endTime) {
             for(Slot bookedSlot : bookedAppointmentSlots) {
+                System.out.println("Booked Start TIME:{}" + Instant.ofEpochMilli(bookedSlot.getStartTime()).atOffset(getLocalZone()).toLocalTime());
+                System.out.println("Booked End TIME:{}" + Instant.ofEpochMilli(bookedSlot.getEndTime()).atOffset(getLocalZone()).toLocalTime());
                 if (bookedSlot.getStartTime() - startTime >= 3600000) {
                     Slot slot = new Slot();
                     slot.setStartTime(startTime);
@@ -156,6 +170,13 @@ public class AppointmentServiceImpl implements AppointmentService {
                 }
                 startTime = bookedSlot.getEndTime();
             }
+            if (endTime - startTime >= 3600000) {
+                Slot slot = new Slot();
+                slot.setStartTime(startTime);
+                slot.setEndTime(endTime);
+                openSlots.add(slot);
+                startTime = endTime;
+            }
         }
 
         return openSlots;
@@ -163,7 +184,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Appointment updateAppointment(AppointmentDTO appointmentDTO) {
-        appointmentRepository.findById(appointmentDTO.getId()).orElseThrow();
+        Appointment appointment =
+                appointmentRepository.findNonDeletedNonCanceledById(appointmentDTO.getId()).orElseThrow();
+        appointment.setRescheduled(true);
         return scheduleAppointment(appointmentDTO);
     }
 

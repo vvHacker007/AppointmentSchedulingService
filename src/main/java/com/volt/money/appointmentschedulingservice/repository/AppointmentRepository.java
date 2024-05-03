@@ -18,4 +18,6 @@ public interface AppointmentRepository extends CrudRepository<Appointment, Strin
                                                                                   String date);
     @Query("{ 'deleted' : false, 'id' : ?0 }")
     Optional<Appointment> findNonDeletedById(String id);
+    @Query("{ 'canceled': false, 'deleted' : false, 'id' : ?0 }")
+    Optional<Appointment> findNonDeletedNonCanceledById(String id);
 }

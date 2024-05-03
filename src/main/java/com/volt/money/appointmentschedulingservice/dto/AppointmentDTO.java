@@ -21,8 +21,8 @@ public class AppointmentDTO {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private Boolean rescheduled;
-    private Boolean canceled;
+    private boolean rescheduled;
+    private boolean canceled;
 
     public Appointment apply(Appointment appointment) {
         appointment.setId(id);
@@ -32,6 +32,8 @@ public class AppointmentDTO {
         slot.setEndTime(getEpoch(startTime, date)+3600000);
         appointment.setSlot(slot);
         appointment.setDate(date.toString());
+        appointment.setRescheduled(rescheduled);
+        appointment.setCanceled(canceled);
         appointment.setCreatedTime(System.currentTimeMillis());
         appointment.setModifiedTime(System.currentTimeMillis());
         return appointment;

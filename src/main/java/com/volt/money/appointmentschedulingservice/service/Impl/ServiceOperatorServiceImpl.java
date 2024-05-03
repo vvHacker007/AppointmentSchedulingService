@@ -51,22 +51,22 @@ public class ServiceOperatorServiceImpl implements ServiceOperatorService {
     }
 
     @Override
-    public ServiceOperator addAppointment(String serviceOperatorId, String appointmentId) {
+    public void addAppointment(String serviceOperatorId, String appointmentId) {
         ServiceOperator serviceOperator =
                 serviceOperatorRepository.findNonDeletedById(serviceOperatorId).orElseThrow();
         List<String> appointments = serviceOperator.getAppointments();
         appointments.add(appointmentId);
         serviceOperator.setAppointments(appointments);
-        return serviceOperatorRepository.save(serviceOperator);
+        serviceOperatorRepository.save(serviceOperator);
     }
 
     @Override
-    public ServiceOperator removeAppointment(String serviceOperatorId, String appointmentId) {
+    public void removeAppointment(String serviceOperatorId, String appointmentId) {
         ServiceOperator serviceOperator =
                 serviceOperatorRepository.findNonDeletedById(serviceOperatorId).orElseThrow();
         List<String> appointments = serviceOperator.getAppointments();
         appointments.remove(appointmentId);
         serviceOperator.setAppointments(appointments);
-        return serviceOperatorRepository.save(serviceOperator);
+        serviceOperatorRepository.save(serviceOperator);
     }
 }
