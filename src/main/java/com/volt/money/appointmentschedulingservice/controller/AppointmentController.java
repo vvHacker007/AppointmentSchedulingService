@@ -59,4 +59,9 @@ public class AppointmentController {
     public ResponseEntity<Appointment> deleteAppointment(@Validated @RequestBody AppointmentDTO appointmentDTO) {
         return ResponseEntity.ok(appointmentService.deleteAppointment(appointmentDTO));
     }
+
+    @PostMapping("/service-operator/date/open-slots")
+    public ResponseEntity<List<Appointment>> getAppointmentByServiceOperatorIdAndLocalDate(@Validated @RequestBody AppointmentDTO appointmentDTO) {
+        return ResponseEntity.ok(appointmentService.getAppointmentByServiceOperatorIdAndLocalDate(appointmentDTO.getServiceOperatorId(), appointmentDTO.getDate()));
+    }
 }
